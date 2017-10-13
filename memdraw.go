@@ -1,9 +1,13 @@
+// package memdraw implements the graphical primitives of a 2D rendering system
+// it is similar to memdraw on plan9, but uses different (and possibly less efficient)
+// algorithms
 package memdraw
 
 import (
 	"image"
 	"image/draw"
-	//	"github.com/as/frame/font"
+
+//	"github.com/as/frame/font"
 )
 
 // Border draws an outline of a rectangle on dst
@@ -81,28 +85,28 @@ func Poly(dst draw.Image, p []image.Point, end0, end1, thick int, src image.Imag
 // The source is aligned so sp in src corresponds to a in dst.
 func Bezier(dst draw.Image, a, b, c, d image.Point, end0, end1, thick int, src image.Image, sp image.Point) {
 
-	// start with a slow implementation and
+	// start with a slow implementation and 
 	// optimize it later when time permits
-	for t := float64(0); t < 1.0; t += 0.5 {
-		curve(dst, []image.Point{a, b, c, d}, t, thick, src, sp)
+	for t := float64(0); t < 1.0; t+= 0.5{
+		curve(dst, []image.Point{a,b,c,d}, t, thick, src, sp)
 	}
 }
 
-func flatcurve(dst draw.Image, p []image.Point, thick int, src image.Image, sp image.Point) {
-
+func flatcurve(dst draw.Image, p []image.Point, thick int, src image.Image, sp image.Point){
+	
 }
 
-func curve(dst draw.Image, p []image.Point, t float64, thick int, src image.Image, sp image.Point) {
-	if len(p) == 1 {
-		r := image.Rect(-1, -1, 1, 1).Inset(-thick + 1).Add(p[0])
+func curve(dst draw.Image, p []image.Point, t float64, thick int, src image.Image, sp image.Point){
+	if len(p) == 1{
+		r := image.Rect(-1,-1,1,1).Inset(-thick+1).Add(p[0])
 		draw.Draw(dst, r, src, sp, draw.Src)
 		return
 	}
 	p2 := make([]image.Point, 0, len(p)-1)
-	for i := 0; i < len(p)-1; i++ {
-		x := int((1-t)*float64(p[i].X) + t*float64(p[i+1].X))
-		y := int((1-t)*float64(p[i].Y) + t*float64(p[i+1].Y))
-		p2 = append(p2, image.Pt(x, y))
+	for i := 0; i < len(p)-1; i++{
+		x := int((1-t) * float64(p[i].X) + t * float64(p[i+1].X))
+		y := int((1-t) * float64(p[i].Y) + t * float64(p[i+1].Y))
+		p2 = append(p2, image.Pt(x,y))
 	}
 	curve(dst, p2, t, thick, src, sp)
 }
