@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/draw"
 
-	"github.com/as/frame/font"
+//	"github.com/as/frame/font"
 )
 
 // Border draws an outline of a rectangle on dst
@@ -35,7 +35,7 @@ func Line(dst draw.Image, q0, q1 image.Point, thick int, src image.Image, sp ima
 	if thick > 0 {
 		thick--
 	}
-	Ellipse(dst, q0, src, thick/2, thick/2, 1, q0, 0, 0)
+	Ellipse(dst, q0, thick/2, thick/2, 1, src, q0, 0, 0)
 	if dx > dy {
 		d := 2*dy - dx
 		for p0.X < dx {
@@ -63,7 +63,7 @@ func Line(dst draw.Image, q0, q1 image.Point, thick int, src image.Image, sp ima
 		}
 	}
 	q1 = image.Pt(p0.X+q0.X, s*p0.Y+q0.Y)
-	Ellipse(dst, q1, src, thick/2, thick/2, 1, q1, 0, 0)
+	Ellipse(dst, q1, thick/2, thick/2, 1, src, q1, 0, 0)
 }
 
 // Poly draws a polygon
@@ -72,7 +72,7 @@ func Poly(dst draw.Image, p []image.Point, end0, end1, thick int, src image.Imag
 		return
 	}
 	for i := 1; i < len(p); i++ {
-		line(dst, p[i-1], p[i], thick, src, sp)
+		Line(dst, p[i-1], p[i], thick, src, sp)
 	}
 }
 
@@ -80,17 +80,32 @@ func Poly(dst draw.Image, p []image.Point, end0, end1, thick int, src image.Imag
 // a, b, c, and d. The end styles are determined by end0
 // and end1; the thickness of the curve is 1+2*thick.
 // The source is aligned so sp in src corresponds to a in dst.
-func Bezier(dst draw.Image, a, b, c, d image.Point, end0, end1, thick int, src, sp image.Point) {
-	//	pts := make([]image.Point, 512)
-	//	t := float64(1/512)
-	//	fx := func(){
-	//	}
-	//	for i := 0; i < 512; i++{
-	//      x = (1-t) * a.x + t * b.x
-	//      y = (1-t) * a.y + t * b.y
-	//	  pts = append(pts, image.Pt(x,y))
-	//	}
-	//	for _, v := range
+func Bezier(dst draw.Image, a, b, c, d image.Point, end0, end1, thick int, src image.Image, sp image.Point) {
+
+	// start with a slow implementation and 
+	// optimize it later when time permits
+	for t := float64(0); t < 1.0; t+= 0.5{
+		curve(dst, []image.Point{a,b,c,d}, t, thick, src, sp)
+	}
+}
+
+func flatcurve(dst draw.Image, p []image.Point, thick int, src image.Image, sp image.Point){
+	
+}
+
+func curve(dst draw.Image, p []image.Point, t float64, thick int, src image.Image, sp image.Point){
+	if len(p) == 1{
+		r := image.Rect(-1,-1,1,1).Inset(-thick+1).Add(p[0])
+		draw.Draw(dst, r, src, sp, draw.Src)
+		return
+	}
+	p2 := make([]image.Point, 0, len(p)-1)
+	for i := 0; i < len(p)-1; i++{
+		x := int((1-t) * float64(p[i].X) + t * float64(p[i+1].X))
+		y := int((1-t) * float64(p[i].Y) + t * float64(p[i+1].Y))
+		p2 = append(p2, image.Pt(x,y))
+	}
+	curve(dst, p2, t, thick, src, sp)
 }
 
 // Bezspline takes the same arguments as poly but draws a
@@ -151,6 +166,7 @@ func Ellipse(dst draw.Image, c image.Point, a, b, thick int, src image.Image, sp
 	}
 }
 
+/*
 func String(dst draw.Image, p image.Point, src image.Image, sp image.Point, ft *font.Font, s []byte) int {
 	for _, b := range s {
 		mask := ft.Char(b)
@@ -163,3 +179,4 @@ func String(dst draw.Image, p image.Point, src image.Image, sp image.Point, ft *
 	}
 	return p.X
 }
+*/
