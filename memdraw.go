@@ -87,7 +87,7 @@ func Bezier(dst draw.Image, a, b, c, d image.Point, end0, end1, thick int, src i
 
 	// start with a slow implementation and 
 	// optimize it later when time permits
-	for t := float64(0); t < 1.0; t+= 0.5{
+	for t := float64(0); t < 1.0; t+= 0.005{
 		curve(dst, []image.Point{a,b,c,d}, t, thick, src, sp)
 	}
 }
