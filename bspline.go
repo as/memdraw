@@ -15,7 +15,7 @@ func Bezspline(dst draw.Image, a, b, c, d image.Point, end0, end1, thick int, sr
 	//		curve(dst, interp(pt, t), t, thick, src, sp)
 	//	}
 	const (
-		seg  = 100.0
+		seg  = 10000.0
 		step = 1 / seg
 	)
 	t := 0.0

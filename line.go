@@ -2,57 +2,97 @@ package memdraw
 
 import (
 	"image"
+	"image/color"
 	"image/draw"
 )
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func Line(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp image.Point) {
+	dx := p1.X - p0.X
+	dy := p1.Y - p0.Y
+	if dx*dx > dy*dy {
+		hLine(dst, p1, p0, thick, src, sp)
+		return
+	}
+	vLine(dst, p1, p0, thick, src, sp)
+}
+
 // Line draws a line from q0 to q1 on dst
-func Line(dst draw.Image, q0, q1 image.Point, thick int, src image.Image, sp image.Point) {
+func vLine(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp image.Point) {
+	if p0.Y > p1.Y {
+		vLine(dst, p1, p0, thick, src, sp)
+		return
+	}
+	dx := p1.X - p0.X
+	dy := p1.Y - p0.Y
+	miny := max(p0.Y, dst.Bounds().Min.Y)
+	maxy := min(p1.Y, dst.Bounds().Max.Y-1)
+	x := 0
+	for y := miny; y <= maxy; y++ {
+		if dy == 0 {
+			x = p0.X
+		} else {
+			x = p0.X + dx*(y-p0.Y)/dy
+		}
+		col := src.At(x, y)
+		dstcol := dst.At(x, y)
+		cr0, cg0, cb0, ca0 := col.RGBA()
+		cr1, cg1, cb1, ca1 := dstcol.RGBA()
+		cr := cr0 + cr1*(255-ca0)
+		cg := cg0 + cg1*(255-ca0)
+		cb := cb0 + cb1*(255-ca0)
+		ca := ca0 + ca1*(255-ca0)
+		dst.Set(x, y, color.RGBA{byte(cr), byte(cg), byte(cb), byte(ca)})
+	}
+}
+
+// Line draws a line from q0 to q1 on dst
+func hLine(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp image.Point) {
 	// Note: There exists a 4-step and 8-step optimization that takes advantage of repeating patterns in the
 	// line. Is it worth it?
-	if q1.X < q0.X {
-		q0, q1 = q1, q0
+	if p1.X < p0.X {
+		hLine(dst, p1, p0, thick, src, sp)
+		return
 	}
-	p0 := q0.Sub(q0)
-	p1 := q1.Sub(q0)
-	dy := p1.Y
-	dx := p1.X
-	s := 1
+	dd := 1
+	dx := p1.X - p0.X
+	dy := p1.Y - p0.Y
 	if dy < 0 {
+		dd = -1
 		dy = -dy
-		s = -1
 	}
-	if thick == 0 {
-		thick++
-	}
-	if thick > 0 {
-		thick--
-	}
-	Ellipse(dst, q0, thick/2, thick/2, 1, src, q0, 0, 0)
-	if dx > dy {
-		d := 2*dy - dx
-		for p0.X < dx {
-			r := image.Rect(p0.X+q0.X, s*p0.Y+q0.Y-thick/2, p0.X+q0.X+1, s*p0.Y+q0.Y+1+thick/2)
-			draw.Draw(dst, r, src, r.Min, draw.Src)
-			if d > 0 {
-				p0.Y++
-				d -= dx
-			}
-			p0.X++
-			d += dy
-		}
-	} else {
-		d := 2*dx - dy
-		for p0.Y < dy {
-			r := image.Rect(p0.X+q0.X-thick/2, s*p0.Y+q0.Y, p0.X+q0.X+1+thick/2, s*p0.Y+q0.Y+1)
-			draw.Draw(dst, r, src, r.Min, draw.Src)
-			if d > 0 {
-				p0.X++
-				d -= dy
-			}
-			p0.Y++
-			d += dx
+	e := 2*dy - dx
+	dy *= 2
+	dx = dy - 2*dx
+	y := p0.Y
+	maxx := min(p1.X, dst.Bounds().Max.X-1)
+	for x := p0.X; x <= maxx; x++ {
+		col := src.At(x, y)
+		dstcol := dst.At(x, y)
+		cr0, cg0, cb0, ca0 := col.RGBA()
+		cr1, cg1, cb1, ca1 := dstcol.RGBA()
+		cr := cr0 + cr1*(255-ca0)
+		cg := cg0 + cg1*(255-ca0)
+		cb := cb0 + cb1*(255-ca0)
+		ca := ca0 + ca1*(255-ca0)
+		dst.Set(x, y, color.RGBA{byte(cr), byte(cg), byte(cb), byte(ca)})
+		if e > 0 {
+			y += dd
+			e += dx
+		} else {
+			e += dy
 		}
 	}
-	q1 = image.Pt(p0.X+q0.X, s*p0.Y+q0.Y)
-	Ellipse(dst, q1, thick/2, thick/2, 1, src, q1, 0, 0)
 }
