@@ -16,7 +16,7 @@ func Bezier(dst draw.Image, a, b, c, d image.Point, end0, end1, thick int, src i
 
 func flatcurve(dst draw.Image, p []image.Point, thick int, src image.Image, sp image.Point) {
 	const (
-		seg  = 18.0
+		seg  = 100.0
 		step = 1 / seg
 	)
 	t := 0.0
