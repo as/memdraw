@@ -79,7 +79,7 @@ func curve(dst draw.Image, p []image.Point, t float64, thick int, src image.Imag
 	return p[0]
 }
 
-func op(p []image.Point, t float64) []image.Point{
+func op(p []image.Point, t float64) []image.Point {
 	p2 := make([]image.Point, 0, len(p)-1)
 	for i := 0; i < len(p)-1; i++ {
 		x := int((1-t)*float64(p[i].X) + t*float64(p[i+1].X))

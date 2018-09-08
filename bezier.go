@@ -38,10 +38,10 @@ func flatcurve(dst draw.Image, p []image.Point, thick int, src image.Image, sp i
 	t := 0.0
 	q := make([]image.Point, seg)
 	{
-	for i := 1; i <= int(seg); i++ {
-		t = float64(i-1) * step
-		q[len(q)-i] = curve(dst, p, t, thick, src, sp)
-	}
+		for i := 1; i <= int(seg); i++ {
+			t = float64(i-1) * step
+			q[len(q)-i] = curve(dst, p, t, thick, src, sp)
+		}
 	}
 	q[0] = p[len(p)-1]
 	q[len(q)-1] = p[0]

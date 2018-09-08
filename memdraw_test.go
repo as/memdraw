@@ -33,7 +33,6 @@ func TestScratch(t *testing.T) {
 	img := image.NewRGBA(image.Rect(0, 0, 1024, 768))
 	testClear(img)
 
-
 	// testRegions(img, 100)
 
 	draw.Draw(img, img.Bounds(), image.Black, zp, draw.Src)
@@ -43,30 +42,30 @@ func TestScratch(t *testing.T) {
 
 }
 
-func testClear(img draw.Image){
+func testClear(img draw.Image) {
 	draw.Draw(img, img.Bounds(), image.Black, zp, draw.Src)
 }
 
-func testBezspline(img draw.Image){
-	 Bezspline(img, zp, image.Pt(0, 64), image.Pt(64, 0), image.Pt(512, 512), 1, 1, 1, white, zp)
+func testBezspline(img draw.Image) {
+	Bezspline(img, zp, image.Pt(0, 64), image.Pt(64, 0), image.Pt(512, 512), 1, 1, 1, white, zp)
 }
 
-func testPoly(img draw.Image){
+func testPoly(img draw.Image) {
 	polyline(img, []image.Point{pt(0, 0), pt(10, 10), pt(50, 50), pt(100, 100)}, 1, 1, 1, red, zp)
 }
 
 func testChromaDither(img draw.Image, u int) {
-		pt := func(x, y int) image.Point { return image.Pt(x+110, y+110) }
-		polyline(img, []image.Point{pt(0, 10), pt(50, 500)}, 2, 1, 5, green, zp)
+	pt := func(x, y int) image.Point { return image.Pt(x+110, y+110) }
+	polyline(img, []image.Point{pt(0, 10), pt(50, 500)}, 2, 1, 5, green, zp)
 
-		pt = func(x, y int) image.Point { return image.Pt(x+111, y+110) }
-		line(img, pt(0, 10), pt(50, 500), 5, red, zp)
+	pt = func(x, y int) image.Point { return image.Pt(x+111, y+110) }
+	line(img, pt(0, 10), pt(50, 500), 5, red, zp)
 
-		pt = func(x, y int) image.Point { return image.Pt(x+112, y+110) }
-		line(img, pt(0, 10), pt(50, 500), 5, blue, zp)
+	pt = func(x, y int) image.Point { return image.Pt(x+112, y+110) }
+	line(img, pt(0, 10), pt(50, 500), 5, blue, zp)
 
-		pt = func(x, y int) image.Point { return image.Pt(x+113, y+110) }
-		line(img, pt(0, 10), pt(50, 500), 5, blue, zp)
+	pt = func(x, y int) image.Point { return image.Pt(x+113, y+110) }
+	line(img, pt(0, 10), pt(50, 500), 5, blue, zp)
 }
 
 func testBezier(img draw.Image, u int) {
@@ -109,4 +108,3 @@ func testRegions(img draw.Image, u int) {
 	line(img, zp, pt(u, u/2), 1, oct(7), zp)
 	line(img, zp, pt(u/2, u), 1, oct(8), zp)
 }
-
