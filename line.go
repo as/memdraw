@@ -27,27 +27,19 @@ var (
 )
 
 func Line(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp image.Point) {
-	defer func() {
-		recover()
-	}()
 	dx := p1.X - p0.X
 	dy := p0.Y - p1.Y
 	if dx*dx > dy*dy {
 		if p0.X > p1.X {
-			hLine1(dst, p1, p0, thick, red, sp)
-			//hLine(dst, p0, p1, thick, image.Black, sp)
+			hLine1(dst, p1, p0, thick, src, sp)
 		} else {
-			hLine1(dst, p0, p1, thick, bl, sp)
-			//hLine(dst, p1, p0, thick, gr, sp)
+			hLine1(dst, p0, p1, thick, src, sp)
 		}
 	} else {
-		//
-		//		vLine(dst, p1, p0, thick, red, sp)
 		if p1.Y > p0.Y {
-			vLine1(dst, p0, p1, thick, gr, sp)
+			vLine1(dst, p0, p1, thick, src, sp)
 		} else {
-			vLine1(dst, p1, p0, thick, bl, sp)
-			//vLine(dst, p0, p1, thick, gra, sp)
+			vLine1(dst, p1, p0, thick, src, sp)
 		}
 	}
 }
@@ -99,14 +91,6 @@ func vLine(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp im
 			col := src.At(x, y)
 			dst.Set(x, y, col)
 		}
-		//dstcol := dst.At(x, y)
-		//cr0, cg0, cb0, ca0 := col.RGBA()
-		//cr1, cg1, cb1, ca1 := dstcol.RGBA()
-		//cr := cr0 + cr1*(255-ca0)
-		//cg := cg0 + cg1*(255-ca0)
-		//cb := cb0 + cb1*(255-ca0)
-		//ca := ca0 + ca1*(255-ca0)
-		//dst.Set(x, y, color.RGBA{byte(cr), byte(cg), byte(cb), byte(ca)})
 	}
 }
 
@@ -114,10 +98,6 @@ func vLine(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp im
 func hLine1(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp image.Point) {
 	// Note: There exists a 4-step and 8-step optimization that takes advantage of repeating patterns in the
 	// line. Is it worth it?
-	if p0.X < p1.X {
-		//hLine(dst, p1, p0, thick, src, sp)
-		//return
-	}
 	dd := 1
 	dx := p1.X - p0.X
 	dy := p1.Y - p0.Y
@@ -147,12 +127,6 @@ func hLine1(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp i
 
 // Line draws a line from q0 to q1 on dst
 func hLine(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp image.Point) {
-	// Note: There exists a 4-step and 8-step optimization that takes advantage of repeating patterns in the
-	// line. Is it worth it?
-	if p0.X < p1.X {
-		//hLine(dst, p1, p0, thick, src, sp)
-		//return
-	}
 	dx := p1.X - p0.X
 	dy := p1.Y - p0.Y
 	clipr := dst.Bounds()
