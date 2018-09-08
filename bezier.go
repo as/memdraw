@@ -1,7 +1,6 @@
 package memdraw
 
 import (
-	"fmt"
 	"image"
 	"image/draw"
 )
