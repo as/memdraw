@@ -32,13 +32,14 @@ var zp = pt(0, 0)
 func TestScratch(t *testing.T) {
 	img := image.NewRGBA(image.Rect(0, 0, 1024, 768))
 	testClear(img)
+
 	u := 100
 	// testRegions(img, u)
-
+	
 	draw.Draw(img, img.Bounds(), image.Black, zp, draw.Src)
 	testBezier(img, u)
 
-	line(img, zp, pt(u, 0), 1, red, zp)
+	line(img, zp, pt(u, 0), 2, red, zp)
 	png.Encode(os.Stdout, img)
 
 }
