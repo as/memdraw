@@ -35,7 +35,7 @@ func TestScratch(t *testing.T) {
 
 	u := 100
 	// testRegions(img, u)
-	
+
 	draw.Draw(img, img.Bounds(), image.Black, zp, draw.Src)
 	testBezier(img, u)
 
