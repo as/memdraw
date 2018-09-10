@@ -74,7 +74,6 @@ func interp(p []image.Point, t float64) []image.Point {
 func curve(dst draw.Image, p []image.Point, t float64, thick int, src image.Image, sp image.Point) image.Point {
 	for len(p) != 1 {
 		p = op(p, t, dst)
-		next()
 	}
 	dst.Set(p[0].X, p[0].Y, src.At(p[0].X, p[0].Y))
 	//r := image.ZR.Inset(-1).Add(p[0])
