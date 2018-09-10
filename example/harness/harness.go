@@ -23,7 +23,7 @@ var (
 	w      = dev.Window()
 	dev, _ = ui.Init(&ui.Config{
 		Width: size.X, Height: size.Y,
-		Title: "Memdraw",
+		Title: "harness",
 	})
 	img, _ = dev.NewBuffer(size)
 	fb     = img.RGBA()
