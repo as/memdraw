@@ -91,4 +91,3 @@ func op(p []image.Point, t float64, dst ...draw.Image) []image.Point {
 	}
 	return p2
 }
-*/
