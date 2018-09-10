@@ -223,7 +223,7 @@ func specialkey(r rune) bool {
 			println("nothing to put")
 			break
 		}
-		fd, err := os.Create("/n/gif.gif")
+		fd, err := os.Create("harness.gif")
 		if err != nil {
 			log.Println("save: error", err)
 			break
