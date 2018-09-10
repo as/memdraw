@@ -3,6 +3,7 @@ package memdraw
 import (
 	"image"
 	"image/draw"
+	"math"
 )
 
 // Bezier draws the N'th degree Bezier curve defined by the
@@ -29,22 +30,36 @@ type tik struct {
 
 var cache = make(map[tik]int)
 
-func flatcurve(dst draw.Image, p []image.Point, thick int, src image.Image, sp image.Point) {
-	const (
-		seg  = 29.0
-		step = 1 / seg
-	)
-	t := 0.0
-	q := make([]image.Point, seg)
-	{
-		for i := 1; i <= int(seg); i++ {
-			t = float64(i-1) * step
-			q[len(q)-i] = curve(dst, p, t, thick, src, sp)
-		}
+type point struct {
+	X, Y float64
+}
+
+func (p point) Round() image.Point {
+	return image.Point{int(math.Round(p.X)), int(math.Round(p.Y))}
+}
+func fpoint64(p ...image.Point) []point {
+	pts := make([]point, 0, len(p))
+	for _, v := range p {
+		pts = append(pts, point{float64(v.X), float64(v.Y)})
 	}
-	q[0] = p[len(p)-1]
-	q[len(q)-1] = p[0]
-	Poly(dst, q[:], 1, 1, thick, src, sp)
+	return pts
+}
+func flatcurve(dst draw.Image, p []image.Point, thick int, src image.Image, sp image.Point) {
+	pts := fpoint64(p...)
+	pts2 := []image.Point{p[0]}
+	for t := 0.0; t <= 1.00; t += 0.01 {
+		q := append([]point{}, pts...)
+		for len(q) > 1 {
+			for i := 0; i < len(q)-1; i++ {
+				q[i].X += (q[i+1].X - q[i].X) * t
+				q[i].Y += (q[i+1].Y - q[i].Y) * t
+			}
+			q = q[:len(q)-1]
+		}
+		pts2 = append(pts2, q[0].Round())
+	}
+	
+	Poly(dst, pts2, 1, 1, 1, src, sp)
 }
 
 func N(t, i, k int) (n int) {
