@@ -28,7 +28,7 @@ var (
 	img, _ = dev.NewBuffer(size)
 	fb     = img.RGBA()
 	down   uint
-	
+
 	sem = make(chan bool, 1)
 )
 
@@ -41,7 +41,7 @@ func blank() {
 func paint() {
 	w.Upload(image.ZP, img, img.Bounds())
 	w.Publish()
-	if recording{
+	if recording {
 		capture(img.RGBA())
 	}
 }
@@ -123,10 +123,10 @@ func main() {
 				}
 			}
 		case e := <-d.Key:
-			if e.Direction == key.DirRelease{
+			if e.Direction == key.DirRelease {
 				continue
 			}
-			if specialkey(e.Rune){
+			if specialkey(e.Rune) {
 				continue
 			}
 			switch e.Code {
@@ -161,11 +161,11 @@ func main() {
  */
 
 var (
-	raw   [30 * 60]image.RGBA
+	raw       [30 * 60]image.RGBA
 	pending   [30 * 60]*image.Paletted
 	fp        int
 	recording bool
-	camera image.Rectangle
+	camera    image.Rectangle
 	g         *gif.GIF
 )
 
@@ -194,25 +194,25 @@ func capture(img image.Image) {
 
 func specialkey(r rune) bool {
 	d := screen.Dev
-	switch r{
+	switch r {
 	case 'r':
-					select {
-					case e := <-d.Mouse:
-						e = readmouse(e)
-						camera.Min=pt(e)
-					case <-d.Key:
-						return true
-					}
-				for down == 0 {
-					e := readmouse(<-d.Mouse)
-					memdraw.Border(fb, camera, 1, image.ZP, black)
-					camera.Max=pt(e)
-					memdraw.Border(fb, camera, 1, image.ZP, red)
-					paint()
-				}
-					memdraw.Border(fb, camera, 1, image.ZP, black)
-					camera = camera.Canon() // lol
-					paint()
+		select {
+		case e := <-d.Mouse:
+			e = readmouse(e)
+			camera.Min = pt(e)
+		case <-d.Key:
+			return true
+		}
+		for down == 0 {
+			e := readmouse(<-d.Mouse)
+			memdraw.Border(fb, camera, 1, image.ZP, black)
+			camera.Max = pt(e)
+			memdraw.Border(fb, camera, 1, image.ZP, red)
+			paint()
+		}
+		memdraw.Border(fb, camera, 1, image.ZP, black)
+		camera = camera.Canon() // lol
+		paint()
 	case 's':
 		fp = 0
 		recording = true
@@ -228,7 +228,7 @@ func specialkey(r rune) bool {
 			log.Println("save: error", err)
 			break
 		}
-		
+
 		r := image.Rectangle{image.ZP, camera.Bounds().Size()}
 		for i := 0; i < fp; i++ {
 			pending[i] = image.NewPaletted(r, palette.Plan9)
@@ -238,10 +238,10 @@ func specialkey(r rune) bool {
 		g.Delay = g.Delay[:fp]
 		gif.EncodeAll(fd, g)
 		fd.Close()
-		for i := range raw[:fp]{
+		for i := range raw[:fp] {
 			draw.Draw(&raw[i], r, image.Transparent, image.ZP, draw.Src)
 		}
-		fp=0
+		fp = 0
 	default:
 		return false
 	}
