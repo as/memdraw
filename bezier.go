@@ -58,7 +58,7 @@ func flatcurve(dst draw.Image, p []image.Point, thick int, src image.Image, sp i
 		}
 		pts2 = append(pts2, q[0].Round())
 	}
-	
+
 	Poly(dst, pts2, 1, 1, 1, src, sp)
 }
 
