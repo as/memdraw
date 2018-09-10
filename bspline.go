@@ -27,6 +27,8 @@ func Bezspline(dst draw.Image, a, b, c, d image.Point, end0, end1, thick int, sr
 	Poly(dst, q, 1, 1, thick, src, sp)
 }
 
+// TODO: Remove/cleanup below
+
 func interp(p []image.Point, t float64) []image.Point {
 	deg := 2
 	n := len(p)
@@ -69,22 +71,24 @@ func interp(p []image.Point, t float64) []image.Point {
 	}
 	return q
 }
-
 func curve(dst draw.Image, p []image.Point, t float64, thick int, src image.Image, sp image.Point) image.Point {
 	for len(p) != 1 {
-		p = op(p, t)
+		p = op(p, t, dst)
+		next()
 	}
-	// r := image.ZR.Inset(-1).Add(p[0])
-	//draw.Draw(dst, r, next(), image.ZP, draw.Src)
+	dst.Set(p[0].X, p[0].Y, src.At(p[0].X, p[0].Y))
+	//r := image.ZR.Inset(-1).Add(p[0])
+	//draw.Draw(dst, r, src, image.ZP, draw.Src)
 	return p[0]
 }
-
-func op(p []image.Point, t float64) []image.Point {
+func op(p []image.Point, t float64, dst ...draw.Image) []image.Point {
 	p2 := make([]image.Point, 0, len(p)-1)
+	
 	for i := 0; i < len(p)-1; i++ {
-		x := int((1-t)*float64(p[i].X) + t*float64(p[i+1].X))
-		y := int((1-t)*float64(p[i].Y) + t*float64(p[i+1].Y))
+		x := p[i].X + int(float64(p[i+1].X-p[i].X)*t)
+		y := p[i].Y + int(float64(p[i+1].Y-p[i].Y)*t)
 		p2 = append(p2, image.Pt(x, y))
 	}
 	return p2
 }
+*/
