@@ -29,7 +29,8 @@ func Ellipse(dst draw.Image, c image.Point, a, b, thick int, src image.Image, sp
 		incy       = func() { y--; dyt += d2yt; t += dyt }
 	)
 	point := func(x, y int) {
-		draw.Draw(dst, image.Rect(x, y, x+1, yc), src, sp, draw.Over)
+		dst.Set(x,y, src.At(x,y))
+		//draw.Draw(dst, image.Rect(x, y, x+1, yc), src, sp, draw.Over)
 		//draw.Draw(dst, image.Rect(x, y, x+1, y-1), src, sp, draw.Over)
 		// Perspective-retaining lines
 		//draw.Draw(dst, image.Rect(x, y, x+1, yc/2), src, sp, draw.Over)
