@@ -6,29 +6,13 @@ import (
 	"image/draw"
 )
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-var (
-	red = image.NewUniform(color.RGBA{255, 0, 0, 255})
-	gr  = image.NewUniform(color.RGBA{0, 255, 0, 255})
-	bl  = image.NewUniform(color.RGBA{0, 0, 255, 255})
-	gra = image.NewUniform(color.RGBA{222, 222, 222, 255})
-)
-
 func Line(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp image.Point) {
+	if !lineInRect(dst.Bounds(), p0, p1) {
+		return
+	}
 	dx := p1.X - p0.X
 	dy := p0.Y - p1.Y
+
 	if dx*dx > dy*dy {
 		if p0.X > p1.X {
 			hLine1(dst, p1, p0, thick, src, sp)
@@ -42,6 +26,41 @@ func Line(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp ima
 			vLine1(dst, p1, p0, thick, src, sp)
 		}
 	}
+}
+
+func lineInRect(r image.Rectangle, p0, p1 image.Point) bool {
+	const toobigmask = 0x7fffffff00000000
+	if (p0.X|p0.Y|p1.X|p1.Y)&toobigmask != 0 {
+		return false
+	}
+	c0 := 0
+
+	if p0.X < r.Min.X {
+		c0 = 1
+	} else if p0.X >= r.Max.X {
+		c0 = 2
+	}
+
+	if p0.Y < r.Min.Y {
+		c0 |= 4
+	} else if p0.Y >= r.Max.Y {
+		c0 |= 8
+	}
+
+	c1 := 0
+
+	if p1.X < r.Min.X {
+		c1 = 1
+	} else if p0.X >= r.Max.X {
+		c1 = 2
+	}
+
+	if p1.Y < r.Min.Y {
+		c1 |= 4
+	} else if p1.Y >= r.Max.Y {
+		c1 |= 8
+	}
+	return c0&c1 == 0
 }
 
 // Line draws a line from q0 to q1 on dst
@@ -141,3 +160,23 @@ func hLine(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp im
 		}
 	}
 }
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+var (
+	red = image.NewUniform(color.RGBA{255, 0, 0, 255})
+	gr  = image.NewUniform(color.RGBA{0, 255, 0, 255})
+	bl  = image.NewUniform(color.RGBA{0, 0, 255, 255})
+	gra = image.NewUniform(color.RGBA{222, 222, 222, 255})
+)
