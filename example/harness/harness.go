@@ -41,11 +41,11 @@ func blank() {
 	draw.Draw(fb, fb.Bounds(), image.Black, image.ZP, draw.Src)
 }
 func redraw() {
-			w.Upload(image.ZP, img, img.Bounds())
-			w.Publish()
-			if recording {
-				capture(img.RGBA())
-			}
+	w.Upload(image.ZP, img, img.Bounds())
+	w.Publish()
+	if recording {
+		capture(img.RGBA())
+	}
 }
 
 var (
@@ -105,7 +105,7 @@ func main() {
 
 					copy(pts, pts[1:])
 					pts[len(pts)-1] = pt(e)
-					
+
 					drawCurve(fb, next(), pts...)
 					redraw()
 				default:
