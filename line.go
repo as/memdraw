@@ -28,39 +28,32 @@ func Line(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp ima
 	}
 }
 
-func lineInRect(r image.Rectangle, p0, p1 image.Point) bool {
-	const toobigmask = 0x7fffffff00000000
-	if (p0.X|p0.Y|p1.X|p1.Y)&toobigmask != 0 {
+// lineOverRect returns true if the line formed by [p0,p1] crosses r
+func lineOverRect(r image.Rectangle, p0, p1 image.Point) bool {
+	if r.Min == r.Max {
+		// can't cross an empty rectangle
 		return false
 	}
-	c0 := 0
+	return sig(r, p0)&sig(r, p1) != 0
+}
 
-	if p0.X < r.Min.X {
-		c0 = 1
-	} else if p0.X >= r.Max.X {
-		c0 = 2
+func sig(r image.Rectangle, p image.Point) int {
+	c := 0
+	if p.X < r.Min.X {
+		c = 1
+	} else if p.X > r.Max.X {
+		c = 2
 	}
-
-	if p0.Y < r.Min.Y {
-		c0 |= 4
-	} else if p0.Y >= r.Max.Y {
-		c0 |= 8
+	if p.Y < r.Max.Y {
+		c |= 4
+	} else if p.Y > r.Max.Y+r.Dy() {
+		c |= 8
 	}
+	return c
+}
 
-	c1 := 0
-
-	if p1.X < r.Min.X {
-		c1 = 1
-	} else if p0.X >= r.Max.X {
-		c1 = 2
-	}
-
-	if p1.Y < r.Min.Y {
-		c1 |= 4
-	} else if p1.Y >= r.Max.Y {
-		c1 |= 8
-	}
-	return c0&c1 == 0
+func lineInRect(r image.Rectangle, p0, p1 image.Point) bool {
+	return lineOverRect(r, p0, p1)
 }
 
 // Line draws a line from q0 to q1 on dst
