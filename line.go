@@ -30,14 +30,13 @@ func Line(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp ima
 
 // lineOverRect returns true if the line formed by [p0,p1] crosses r
 func lineOverRect(r image.Rectangle, p0, p1 image.Point) bool {
-	if r.Min == r.Max {
-		// can't cross an empty rectangle
-		return false
+	if r.Empty() {
+		return false // can't cross an empty rectangle
 	}
-	return sig(r, p0)&sig(r, p1) != 0
+	return oc(r, p0)&oc(r, p1) != 0
 }
 
-func sig(r image.Rectangle, p image.Point) int {
+func oc(r image.Rectangle, p image.Point) int {
 	c := 0
 	if p.X < r.Min.X {
 		c = 1
