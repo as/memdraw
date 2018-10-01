@@ -43,8 +43,7 @@ func lineInRect(r image.Rectangle, p0, p1 image.Point) bool {
 	if c0&c1 != 0 {
 		return false
 	}
-	if (c0|c1) == 3 || (c0|c1) == 12 {
-//	if c0 == 0 || c1 == 0 || (c0|c1) == 3 || (c0|c1) == 12 {
+	if c0|c1 == 3 || c0|c1 == 12 {
 		return true
 	}
 	c := [4]image.Point{
@@ -106,7 +105,6 @@ var lut = [256][3]byte{
 	0x5a: {0, 1, 0x80 + 0x12},
 	0x69: {1, 0, 0x80 + 0x03},
 }
-
 func init() {
 	for i := byte(0); i < 127; i++ {
 		if i > 127 {
@@ -115,8 +113,6 @@ func init() {
 		v := lut[i]
 		lut[i<<4|i>>4] = [3]byte{v[1], v[0], v[2]}
 	}
-	//	lut[0x86] = [3]byte{1, 0, 3}
-	//	lut[0x68] = [3]byte{0, 1, 3}
 }
 
 func oc(r image.Rectangle, p image.Point) int {
