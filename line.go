@@ -43,7 +43,8 @@ func lineInRect(r image.Rectangle, p0, p1 image.Point) bool {
 	if c0&c1 != 0 {
 		return false
 	}
-	if c0 == 0 || c1 == 0 || (c0|c1) == 3 || (c0|c1) == 12 {
+	if (c0|c1) == 3 || (c0|c1) == 12 {
+//	if c0 == 0 || c1 == 0 || (c0|c1) == 3 || (c0|c1) == 12 {
 		return true
 	}
 	c := [4]image.Point{
@@ -72,6 +73,20 @@ func b2(v, p, a image.Point) bool {
 	return !(slope(v, p) < slope(v, a))
 }
 
+func Oc(r image.Rectangle, p image.Point) int {
+	c := 0
+	if p.X < r.Min.X {
+		c = 1
+	} else if p.X >= r.Max.X{
+		c = 2
+	}
+	if p.Y < r.Min.Y {
+		c |= 4
+	} else if p.Y >= r.Max.Y {
+		c |= 8
+	}
+	return c
+}
 var lut = [256][3]byte{
 	0x14: {0, 1, 0},
 	0x16: {0, 1, 0},
@@ -108,24 +123,6 @@ func oc(r image.Rectangle, p image.Point) int {
 	return Oc(r, p)
 }
 
-func Oc(r image.Rectangle, p image.Point) int {
-	px, py := p.X, p.Y
-	x, y := r.Min.X, r.Min.Y
-	w, h := r.Dx(), r.Dy()
-	c := 0
-	if px < x {
-		c = 1
-	} else if px >= x+w {
-		c = 2
-	}
-
-	if py < y {
-		c |= 4
-	} else if py >= y+h {
-		c |= 8
-	}
-	return c
-}
 
 // Line draws a line from q0 to q1 on dst
 func vLine1(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp image.Point) {
