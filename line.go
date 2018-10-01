@@ -28,31 +28,103 @@ func Line(dst draw.Image, p0, p1 image.Point, thick int, src image.Image, sp ima
 	}
 }
 
-// lineOverRect returns true if the line formed by [p0,p1] crosses r
-func lineOverRect(r image.Rectangle, p0, p1 image.Point) bool {
-	if r.Empty() {
-		return false // can't cross an empty rectangle
-	}
-	return oc(r, p0)&oc(r, p1) != 0
-}
+var lineOverRect = LineInRect
 
-func oc(r image.Rectangle, p image.Point) int {
-	c := 0
-	if p.X < r.Min.X {
-		c = 1
-	} else if p.X > r.Max.X {
-		c = 2
-	}
-	if p.Y < r.Max.Y {
-		c |= 4
-	} else if p.Y > r.Max.Y+r.Dy() {
-		c |= 8
-	}
-	return c
+func LineInRect(r image.Rectangle, p0, p1 image.Point) bool {
+	return lineInRect(r, p0, p1)
 }
 
 func lineInRect(r image.Rectangle, p0, p1 image.Point) bool {
-	return lineOverRect(r, p0, p1)
+	if r.Empty() {
+		return false // can't cross an empty rectangle
+	}
+	c0 := oc(r, p0)
+	c1 := oc(r, p1)
+	if c0&c1 != 0 {
+		return false
+	}
+	if c0 == 0 || c1 == 0 || (c0|c1) == 3 || (c0|c1) == 12 {
+		return true
+	}
+	c := [4]image.Point{
+		r.Min,
+		image.Point{r.Max.X, r.Min.Y},
+		image.Point{r.Min.X, r.Max.Y},
+		r.Max,
+	}
+	p := [2]image.Point{p0, p1}
+	q := lut[byte(c0<<4 | c1)]
+	
+	if q[2] >= 0x80 {
+		return b3(p[q[0]], p[q[1]], c[(q[2]&^0x80)>>4], c[q[2]&3])
+	}
+	return b2(p[q[0]], p[q[1]], c[q[2]])
+}
+
+func slope(p1, p2 image.Point) (m float64) {
+	return float64(p2.Y-p1.Y) / float64(p2.X-p1.X)
+}
+func b3(v, p, a, b image.Point) bool {
+	dp := slope(v, p)
+	return !(dp > slope(v, b) || dp < slope(v, a))
+}
+func b2(v, p, a image.Point) bool {
+	return !(slope(v, p) < slope(v, a))
+}
+
+var lut = [256][3]byte{
+	0x14: {0, 1, 0},
+	0x16: {0, 1, 0},
+	0x18: {1, 0, 2},
+	0x1a: {1, 0, 2},
+
+	0x24: {1, 0, 1},
+	0x25: {1, 0, 1},
+	0x28: {0, 1, 3},
+	0x29: {0, 1, 3},
+
+	0x49: {1, 0, 0},
+	0x4a: {0, 1, 1},
+
+	0x58: {1, 0, 2},
+	0x68: {0, 1, 3},
+	0x5a: {0, 1, 0x80 + 0x12},
+	0x69: {1, 0, 0x80 + 0x03},
+}
+
+func init() {
+	for i := byte(0); i < 127; i++ {
+		if i > 127 {
+			break
+		}
+		v := lut[i]
+		lut[i<<4|i>>4] = [3]byte{v[1], v[0], v[2]}
+	}
+	//	lut[0x86] = [3]byte{1, 0, 3}
+	//	lut[0x68] = [3]byte{0, 1, 3}
+}
+
+func oc(r image.Rectangle, p image.Point) int {
+	return Oc(r, p)
+}
+
+func Oc(r image.Rectangle, p image.Point) int {
+	px, py := p.X, p.Y
+	x, y := r.Min.X, r.Min.Y
+	w, h := r.Dx(), r.Dy()
+	c := 0
+	if px < x {
+		c = 1
+	} else if px >= x+w {
+		c = 2
+	}
+
+	if py < y {
+		c |= 4
+	} else if py >= y+h {
+		c |= 8
+	}
+	return c
 }
 
 // Line draws a line from q0 to q1 on dst
